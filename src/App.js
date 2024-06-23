@@ -14,12 +14,25 @@ function App() {
   const fetchMovieHandler = useCallback(async () => {
     setIsLoading(true);
     try {
-      const data = await fetch("https://swapi.dev/api/films/");
+      const data = await fetch(
+        "https://react-http-e1bb9-default-rtdb.firebaseio.com/movies.json"
+      );
       if (!data.ok) {
         throw new Error("Something went wrong... Retrying");
       }
       const MovieList = await data.json();
-      setMovies(MovieList.results);
+      const loadedMovies = [];
+      console.log(MovieList);
+      for (const key in MovieList) {
+        console.log(key);
+        loadedMovies.push({
+          id: key,
+          title: MovieList[key].title,
+          openingText: MovieList[key].openingText,
+          releaseDate: MovieList[key].releaseDate,
+        });
+      }
+      setMovies(loadedMovies);
       setError(null);
     } catch (error) {
       setError(error.message);
@@ -45,10 +58,41 @@ function App() {
     setError("Retry cancelled");
   }, []);
 
+  const addMovieHandler = async (movie) => {
+    const response = await fetch(
+      "https://react-http-e1bb9-default-rtdb.firebaseio.com/movies.json",
+      {
+        method: "POST",
+        body: JSON.stringify(movie),
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to add movie.");
+    }
+    const data = await response.json();
+
+    // console.log(data);
+  };
+  const deleteHandler = (id) => {
+    console.log(id);
+    fetch(
+      `https://react-http-e1bb9-default-rtdb.firebaseio.com/movies/${id}.json`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+  };
+
   return (
     <React.Fragment>
       <section>
-        <AddMovieForm />
+        <AddMovieForm addMovie={addMovieHandler} />
+      </section>
+      <section>
         <button onClick={fetchMovieHandler}>Fetch Movies</button>
         {error && (
           <button onClick={cancelRetryHandler} style={{ marginLeft: "10px" }}>
@@ -60,7 +104,9 @@ function App() {
       <section>
         {isLoading && <Loader />}
         {!isLoading && movies.length === 0 && !error && <p>No Movies Found</p>}
-        {!isLoading && movies.length > 0 && <MoviesList movies={movies} />}
+        {!isLoading && movies && movies.length > 0 && (
+          <MoviesList movies={movies} onDelete={deleteHandler} />
+        )}
         {!isLoading && error && <p>{error}</p>}
       </section>
     </React.Fragment>

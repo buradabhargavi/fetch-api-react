@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from "react";
 import "./Form.css";
 
-function AddMovieForm() {
+function AddMovieForm(props) {
   const [title, setTitle] = useState("");
   const [openingText, setOpeningText] = useState("");
   const [releaseDate, setReleaseDate] = useState("");
@@ -14,7 +14,8 @@ function AddMovieForm() {
         openingText,
         releaseDate,
       };
-      console.log(newMovie);
+      props.addMovie(newMovie);
+      //  console.log(newMovie);
       setTitle("");
       setOpeningText("");
       setReleaseDate("");
