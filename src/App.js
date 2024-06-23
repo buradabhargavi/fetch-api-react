@@ -1,5 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
-
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import MoviesList from "./components/MoviesList";
 import Loader from "./components/Loader";
 import "./App.css";
@@ -12,16 +11,20 @@ function App() {
   const retryTimeout = useRef(null);
 
   useEffect(() => {
+    fetchMovieHandler();
+  }, []);
+
+  useEffect(() => {
     if (retry) {
       fetchMovieHandler();
     }
     return () => clearTimeout(retryTimeout.current);
   }, [retry]);
 
-  const fetchMovieHandler = async () => {
+  const fetchMovieHandler = useCallback(async () => {
     setIsLoading(true);
     try {
-      const data = await fetch("https://swapi.dev/api/film/");
+      const data = await fetch("https://swapi.dev/api/films/");
       if (!data.ok) {
         throw new Error("Something went wrong... Retrying");
       }
@@ -33,13 +36,13 @@ function App() {
       retryTimeout.current = setTimeout(fetchMovieHandler, 5000);
     }
     setIsLoading(false);
-  };
+  }, []);
 
-  const cancelRetryHandler = () => {
+  const cancelRetryHandler = useCallback(() => {
     clearTimeout(retryTimeout.current);
     setRetry(false);
     setError("Retry cancelled");
-  };
+  }, []);
 
   return (
     <React.Fragment>
@@ -62,4 +65,4 @@ function App() {
   );
 }
 
-export default App;
+export default React.memo(App);
