@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import MoviesList from "./components/MoviesList";
 import Loader from "./components/Loader";
+import AddMovieForm from "./Form/Form";
 import "./App.css";
 
 function App() {
@@ -9,17 +10,6 @@ function App() {
   const [error, setError] = useState(null);
   const [retry, setRetry] = useState(false);
   const retryTimeout = useRef(null);
-
-  useEffect(() => {
-    fetchMovieHandler();
-  }, []);
-
-  useEffect(() => {
-    if (retry) {
-      fetchMovieHandler();
-    }
-    return () => clearTimeout(retryTimeout.current);
-  }, [retry]);
 
   const fetchMovieHandler = useCallback(async () => {
     setIsLoading(true);
@@ -38,6 +28,17 @@ function App() {
     setIsLoading(false);
   }, []);
 
+  useEffect(() => {
+    fetchMovieHandler();
+  }, []);
+
+  useEffect(() => {
+    if (retry) {
+      fetchMovieHandler();
+    }
+    return () => clearTimeout(retryTimeout.current);
+  }, [retry]);
+
   const cancelRetryHandler = useCallback(() => {
     clearTimeout(retryTimeout.current);
     setRetry(false);
@@ -47,6 +48,7 @@ function App() {
   return (
     <React.Fragment>
       <section>
+        <AddMovieForm />
         <button onClick={fetchMovieHandler}>Fetch Movies</button>
         {error && (
           <button onClick={cancelRetryHandler} style={{ marginLeft: "10px" }}>

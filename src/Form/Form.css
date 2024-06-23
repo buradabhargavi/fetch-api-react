@@ -1,0 +1,17 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 5% 10%;
+  gap: 20px;
+}
+
+.inCls {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+}
+
+button {
+  margin-top: 20px;
+}
