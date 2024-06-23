@@ -1,17 +1,22 @@
 import React, { useState } from "react";
 
 import MoviesList from "./components/MoviesList";
+import Loader from "./components/Loader";
 import "./App.css";
 
 function App() {
   const [movies, setMovies] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
   const fetchMovieHandler = async () => {
     try {
+      setIsLoading(true);
       const data = await fetch("https://swapi.dev/api/films/");
       const MovieList = await data.json();
       // console.log(MovieList);
 
       setMovies(MovieList.results);
+      setIsLoading(false);
     } catch (error) {
       console.log(error);
     }
@@ -50,8 +55,11 @@ function App() {
       <section>
         <button onClick={fetchMovieHandler}>Fetch Movies</button>
       </section>
+
       <section>
-        <MoviesList movies={movies} />
+        {isLoading && <Loader />}
+        {!isLoading && movies.length === 0 && <p>No Movies Found</p>}
+        {!isLoading && movies.length > 0 && <MoviesList movies={movies} />}
       </section>
     </React.Fragment>
   );
